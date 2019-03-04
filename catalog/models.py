@@ -7,8 +7,8 @@ import uuid # Required for unique book instances
 
 class Genre(models.Model):
     """
-       Model representing a book genre (e.g. Science Fiction, Non Fiction).
-       """
+   Model representing a book genre (e.g. Science Fiction, Non Fiction).
+   """
     name = models.CharField(max_length=200, help_text="Enter a book genre (e.g. Science Fiction, French Poetry etc.)")
 
     def __str__(self):
@@ -46,6 +46,14 @@ class Book(models.Model):
         """
         return reverse('book-detail', args=[str(self.id)])
 
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([genre.name for genre in self.genre.all()[:3]])
+
+    display_genre.short_description = 'Genre'
+
 
 class BookInstance(models.Model):
     """
@@ -56,6 +64,7 @@ class BookInstance(models.Model):
     book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
+    language = models.ForeignKey('Language', null=True, blank=True, on_delete=models.SET_NULL)
 
     LOAN_STATUS = (
         ('m', 'Maintenance'),
@@ -96,3 +105,13 @@ class Author(models.Model):
             String for representing the Model object.
             """
             return '%s, %s' % (self.last_name, self.first_name)
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=200, help_text="Enter a book language")
+
+    def __str__(self):
+        """
+        String for representing the Model object
+        """
+        return '%s' % (self.name)
